@@ -1,58 +1,126 @@
 {
-  "name": "vrtDashboard",
+  "name": "frontend",
   "type": "project:application",
   "bundler": {
-    "id": "webpack",
-    "displayName": "Webpack"
+    "id": "cli",
+    "displayName": "Aurelia-CLI"
   },
   "httpProtocol": {
-    "id": "http2",
-    "displayName": "HTTP/2"
+    "id": "http1",
+    "displayName": "HTTP/1.1"
   },
   "build": {
+    "targets": [
+      {
+        "id": "web",
+        "displayName": "Web",
+        "port": 9000,
+        "index": "index.html",
+        "baseDir": ".",
+        "output": "scripts"
+      }
+    ],
     "options": {
-      "server": "dev",
-      "extractCss": "prod",
-      "coverage": false
+      "minify": "stage & prod",
+      "sourcemaps": "dev & stage",
+      "rev": false,
+      "cache": "dev & stage"
+    },
+    "bundles": [
+      {
+        "name": "app-bundle.js",
+        "source": [
+          "**/*.{js,json,css,html}"
+        ]
+      },
+      {
+        "name": "vendor-bundle.js",
+        "prepend": [
+          "node_modules/bluebird/js/browser/bluebird.core.js",
+          {
+            "path": "node_modules/aurelia-cli/lib/resources/scripts/configure-bluebird-no-long-stacktraces.js",
+            "env": "stage & prod"
+          },
+          {
+            "path": "node_modules/aurelia-cli/lib/resources/scripts/configure-bluebird.js",
+            "env": "dev"
+          },
+          "node_modules/@babel/polyfill/browser.js",
+          "node_modules/requirejs/require.js"
+        ],
+        "dependencies": [
+          "aurelia-bootstrapper",
+          "aurelia-loader-default",
+          "aurelia-pal-browser",
+          {
+            "name": "aurelia-testing",
+            "env": "dev"
+          },
+          "text"
+        ]
+      }
+    ],
+    "loader": {
+      "type": "require",
+      "configTarget": "vendor-bundle.js",
+      "includeBundleMetadataInConfig": "auto",
+      "plugins": [
+        {
+          "name": "text",
+          "extensions": [
+            ".html",
+            ".css"
+          ],
+          "stub": true
+        }
+      ]
     }
   },
   "platform": {
     "id": "web",
     "displayName": "Web",
-    "hmr": false,
-    "open": false,
-    "port": 8080,
-    "output": "dist"
-  },
-  "loader": {
-    "id": "none",
-    "displayName": "None"
+    "port": 9000,
+    "index": "index.html",
+    "baseDir": ".",
+    "output": "scripts"
   },
   "transpiler": {
-    "id": "babel",
-    "displayName": "Babel",
-    "fileExtension": ".js"
+    "id": "typescript",
+    "displayName": "TypeScript",
+    "fileExtension": ".ts",
+    "dtsSource": [
+      "./custom_typings/**/*.d.ts"
+    ],
+    "source": "src/**/*.ts"
   },
   "markupProcessor": {
     "id": "none",
     "displayName": "None",
-    "fileExtension": ".html"
+    "fileExtension": ".html",
+    "source": "src/**/*.html"
   },
   "cssProcessor": {
     "id": "none",
     "displayName": "None",
-    "fileExtension": ".css"
+    "fileExtension": ".css",
+    "source": "src/**/*.css"
   },
   "jsonProcessor": {
     "id": "none",
     "displayName": "None",
-    "fileExtension": ".json"
+    "fileExtension": ".json",
+    "source": "src/**/*.json"
   },
   "editor": {
     "id": "vscode",
     "displayName": "Visual Studio Code"
   },
-  "unitTestRunners": [],
+  "unitTestRunners": [
+    {
+      "id": "none",
+      "displayName": "None"
+    }
+  ],
   "integrationTestRunner": {
     "id": "none",
     "displayName": "None"
