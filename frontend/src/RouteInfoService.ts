@@ -29,6 +29,9 @@ export class RouteInfoService {
         });
     }
     getRouteColor(shortName){
-        return this.routesMap.get(shortName)["routeColor"];
+        let route = this.routesMap.get(shortName);
+        if(route)
+            return route["routeColor"];
+        return '#ffffff';
     }
 }
