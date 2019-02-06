@@ -1,0 +1,9 @@
+.arrival {
+    margin: 5px;
+}
+.arrivalText {
+    border: black solid 1px;
+    padding: 5px;
+    display: inline-block;
+    width: 400px;
+}

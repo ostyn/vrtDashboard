@@ -1,7 +1,8 @@
 import { inject, observable } from 'aurelia-framework';
 import { VrtDao } from "VrtDao";
+import { RouteInfoService } from "RouteInfoService";
 import {Router, activationStrategy} from 'aurelia-router';
-@inject(VrtDao, Router)
+@inject(VrtDao, Router, RouteInfoService)
 export class BusTracker {
     currentStop = undefined;
     currentRoute = undefined;
@@ -15,11 +16,12 @@ export class BusTracker {
     router: any;
     routes: any;
     timeSinceLastDataTimestamp: number;
+    routeInfoService: any;
     selectedRouteChanged(newVal, oldVal) {
         this.stops = undefined;
         if (this.selectedRoute) {
-            this.currentRoute = this.selectedRoute.routeId;
-            this.vrtDao.getStopsOnRoute(this.currentRoute)
+            this.currentRoute = this.selectedRoute;
+            this.vrtDao.getStopsOnRoute(this.currentRoute.routeId)
                 .then((stops) => {
                     stops.data.forEach(stop => {
                         if (stop.stopId == this.currentStop)
@@ -39,24 +41,22 @@ export class BusTracker {
             this.interval = setInterval(this.getStatusForCurrentStop, 10000);
             this.router.navigate(this.router.generate('bus', {
                 stopId : this.currentStop,
-                routeId : this.currentRoute
+                route : this.currentRoute.shortName
             }));
         }
     }
     determineActivationStrategy(){
         return activationStrategy.noChange;
     }
-    activate(params, routeConfig, navigationInstruction) {
-        this.currentRoute = params.routeId;
+    async activate(params, routeConfig, navigationInstruction) {
+        this.currentRoute = params.shortName;
         this.currentStop = params.stopId;
-        this.vrtDao.getRoutes()
-            .then((routes) => {
-                routes.data.forEach(route => {
-                    if (route.routeId == this.currentRoute)
-                        this.selectedRoute = route;
-                });
-                this.routes = routes;
-            });
+        this.routes = await this.routeInfoService.getAllRoutes();
+        this.routes.forEach(route => {
+            if (route.shortName == params.route)
+                this.selectedRoute = route;
+                this.currentRoute = this.selectedRoute;
+        });
     }
 
     getStatusForCurrentStop = () => {
@@ -74,9 +74,29 @@ export class BusTracker {
             this.timeSinceLastDataTimestamp = Math.round((new Date().getTime() - new Date(this.currentStopInfo.time).getTime())/1000);
     }
 
-    constructor(vrtDao, router) {
+    constructor(vrtDao, router, routeInfoService) {
         this.vrtDao = vrtDao;
         this.router = router;
+        this.routeInfoService = routeInfoService
         setInterval(() => this.updateTimeSinceLastDataTimestamp(), 1000);
     }
+    arrivalText(arriving)
+    {
+        return `${arriving.routeLongName}: ${arriving.status} to ${arriving.destination}`;
+    }
+    getRouteStyle(routeShortName) {
+        let color = this.routeInfoService.getRouteColor(routeShortName);
+        return {
+            'background':color, 
+            'color':this.getColorByBgColor(color)
+        };
+    }
+    getColorByBgColor(bgColor) {
+        var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
+        var r = parseInt(color.substring(0, 2), 16); // hexToR
+        var g = parseInt(color.substring(2, 4), 16); // hexToG
+        var b = parseInt(color.substring(4, 6), 16); // hexToB
+        return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 186) ?
+          '#000000' : '#ffffff';
+      }
 }
