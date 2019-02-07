@@ -2,8 +2,26 @@
     margin: 5px;
 }
 .arrivalText {
-    border: black solid 1px;
-    padding: 5px;
+    border: black solid 2px;
+    padding: 10px;
+    border-radius: 5px;
     display: inline-block;
-    width: 400px;
+}
+.controlArea{
+    margin: 5px;
+}
+.footer {
+    position: fixed;
+    bottom: 0;
+    margin: 10px;
+    width: 100%;
+}
+.arrivalContainer {
+    max-width: 400px;
+}
+body {
+    margin: 0px;
+}
+.page {
+    margin: 8px;
 }

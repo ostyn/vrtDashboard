@@ -88,7 +88,8 @@ export class BusTracker {
         let color = this.routeInfoService.getRouteColor(routeShortName);
         return {
             'background':color, 
-            'color':this.getColorByBgColor(color)
+            'color':this.getColorByBgColor(color),
+            'padding': '10px'
         };
     }
     getColorByBgColor(bgColor) {
