@@ -3,9 +3,8 @@
 }
 .arrivalText {
     border: black solid 2px;
-    padding: 10px;
     border-radius: 5px;
-    display: inline-block;
+    display: block;
 }
 .controlArea{
     margin: 5px;
