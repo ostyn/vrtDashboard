@@ -12,15 +12,22 @@
 .footer {
     position: fixed;
     bottom: 0;
-    margin: 10px;
+    padding: 10px;
     width: 100%;
+    background: lightgray;
+    height: 20px;
 }
 .arrivalContainer {
     max-width: 400px;
+    display: inline-block;
 }
 body {
     margin: 0px;
+    font-family: 'Assistant', sans-serif;
+    font-size: 18px;
 }
 .page {
     margin: 8px;
+    padding-bottom: 40px;
+    text-align: center;
 }

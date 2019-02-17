@@ -23,11 +23,20 @@ export class BusTracker {
             this.currentRoute = this.selectedRoute;
             this.vrtDao.getStopsOnRoute(this.currentRoute.routeId)
                 .then((stops) => {
-                    stops.data.forEach(stop => {
+                    let dedupedStops = {};
+                    for(let i = 0; i< stops.data.length; i++)
+                    {
+                        let stop = stops.data[i];
+                        dedupedStops[stop.stopId] = stop;
                         if (stop.stopId == this.currentStop)
                             this.selectedStop = stop;
-                    });
-                    this.stops = stops;
+                    }
+                    this.stops = Object.values(dedupedStops);
+                    this.stops.sort(
+                        (a, b) => {
+                            return a.stopName.localeCompare(b.stopName);
+                        }
+                    );
                 });
         }
     }
