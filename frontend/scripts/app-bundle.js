@@ -318,14 +318,22 @@ define('bus-tracker',["require", "exports", "aurelia-framework", "VrtDao", "Rout
                 this.timeSinceLastDataTimestamp = Math.round((new Date().getTime() - new Date(this.currentStopInfo.time).getTime()) / 1000);
         };
         BusTracker.prototype.arrivalText = function (arriving) {
-            return arriving.routeLongName + ": " + arriving.status + " to " + arriving.destination;
+            var currentDate = new Date().getTime();
+            var eta = Math.round((Date.parse(arriving.predictedArrivalTime) - currentDate) / 1000 / 60);
+            var etd = Math.round((Date.parse(arriving.predictedDepartureTime) - currentDate) / 1000 / 60);
+            var optionalArrivalInfo = '';
+            if (arriving.timePoint && arriving.arriveComplete)
+                optionalArrivalInfo = 'At Stop';
+            else if ((arriving.timePoint))
+                optionalArrivalInfo = 'Arriving in ' + eta + ' minutes';
+            return arriving.routeLongName + ": " + optionalArrivalInfo + " Departing in " + etd + " minutes to " + arriving.destination;
         };
         BusTracker.prototype.getRouteStyle = function (routeShortName) {
             var color = this.routeInfoService.getRouteColor(routeShortName);
             return {
                 'background': color,
                 'color': this.getColorByBgColor(color),
-                'padding': '10px'
+                'padding': '5px'
             };
         };
         BusTracker.prototype.getColorByBgColor = function (bgColor) {
@@ -395,6 +403,6 @@ define('resources/index',["require", "exports"], function (require, exports) {
 
 
 ;
-define('text!style.css',[],function(){return ".arrival {\r\n    margin: 5px;\r\n}\r\n.arrivalText {\r\n    border: black solid 2px;\r\n    border-radius: 5px;\r\n    display: block;\r\n}\r\n.controlArea{\r\n    margin: 5px;\r\n}\r\n.footer {\r\n    position: fixed;\r\n    bottom: 0;\r\n    padding: 10px;\r\n    width: 100%;\r\n    background: lightgray;\r\n    height: 20px;\r\n}\r\n.arrivalContainer {\r\n    max-width: 400px;\r\n    display: inline-block;\r\n}\r\nbody {\r\n    margin: 0px;\r\n    font-family: 'Assistant', sans-serif;\r\n    font-size: 18px;\r\n}\r\n.page {\r\n    margin: 8px;\r\n    padding-bottom: 40px;\r\n    text-align: center;\r\n}";});;
+define('text!style.css',[],function(){return "html {\r\n    height: 80%;\r\n}\r\nbody {\r\n    height: 100%;\r\n}\r\n.arrival {\r\n    margin: 5px;\r\n    height: 85px;\r\n    width: 400px;\r\n    display: flex;\r\n}\r\n.arrivalText {\r\n    border: black solid 2px;\r\n    border-radius: 5px;\r\n    display: block;\r\n    width: 100%;\r\n    padding-top: 0px;\r\n}\r\n.controlArea{\r\n    margin: 5px;\r\n}\r\n.footer {\r\n    position: fixed;\r\n    bottom: 0;\r\n    padding: 10px;\r\n    width: 100%;\r\n    background: lightgray;\r\n    height: 20px;\r\n}\r\n.arrivalContainer {\r\n    display: -ms-flexbox;\r\n    display: -webkit-flex;\r\n    display: flex;\r\n    -webkit-flex-flow: wrap column;\r\n    flex-flow: wrap column;\r\n    max-height: 100%;\r\n}\r\n\r\nbody {\r\n    margin: 0px;\r\n    font-family: 'Assistant', sans-serif;\r\n    font-size: 18px;\r\n}\r\n.page {\r\n    margin: 8px;\r\n    padding-bottom: 40px;\r\n    height: 100%;\r\n    display: inline-block;\r\n}";});;
 define('resources',['resources/index'],function(m){return m;});
 //# sourceMappingURL=app-bundle.js.map
