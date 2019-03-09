@@ -91,14 +91,22 @@ export class BusTracker {
     }
     arrivalText(arriving)
     {
-        return `${arriving.routeLongName}: ${arriving.status} to ${arriving.destination}`;
+        let currentDate = new Date().getTime();
+        let eta= Math.round((Date.parse(arriving.predictedArrivalTime)-currentDate)/1000/60);
+        let etd= Math.round((Date.parse(arriving.predictedDepartureTime)-currentDate)/1000/60);
+        let optionalArrivalInfo = '';
+        if(arriving.timePoint && arriving.arriveComplete)
+            optionalArrivalInfo = 'At Stop';
+        else if((arriving.timePoint))
+            optionalArrivalInfo = 'Arriving in ' + eta + ' minutes';
+        return `${arriving.routeLongName}: ${optionalArrivalInfo} Departing in ${etd} minutes to ${arriving.destination}`;
     }
     getRouteStyle(routeShortName) {
         let color = this.routeInfoService.getRouteColor(routeShortName);
         return {
             'background':color, 
             'color':this.getColorByBgColor(color),
-            'padding': '10px'
+            'padding': '5px'
         };
     }
     getColorByBgColor(bgColor) {
