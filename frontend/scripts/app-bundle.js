@@ -317,16 +317,20 @@ define('bus-tracker',["require", "exports", "aurelia-framework", "VrtDao", "Rout
             if (this.currentStopInfo)
                 this.timeSinceLastDataTimestamp = Math.round((new Date().getTime() - new Date(this.currentStopInfo.time).getTime()) / 1000);
         };
-        BusTracker.prototype.arrivalText = function (arriving) {
+        BusTracker.prototype.getArrivalText = function (arriving) {
             var currentDate = new Date().getTime();
-            var eta = Math.round((Date.parse(arriving.predictedArrivalTime) - currentDate) / 1000 / 60);
-            var etd = Math.round((Date.parse(arriving.predictedDepartureTime) - currentDate) / 1000 / 60);
+            var eta = Math.max(Math.round((Date.parse(arriving.predictedArrivalTime) - currentDate) / 1000 / 60), 0);
             var optionalArrivalInfo = '';
             if (arriving.timePoint && arriving.arriveComplete)
                 optionalArrivalInfo = 'At Stop';
             else if ((arriving.timePoint))
-                optionalArrivalInfo = 'Arriving in ' + eta + ' minutes';
-            return arriving.routeLongName + ": " + optionalArrivalInfo + " Departing in " + etd + " minutes to " + arriving.destination;
+                optionalArrivalInfo = 'Arriving in ' + eta + ' min';
+            return optionalArrivalInfo;
+        };
+        BusTracker.prototype.getDepartureText = function (arriving) {
+            var currentDate = new Date().getTime();
+            var etd = Math.max(Math.round((Date.parse(arriving.predictedDepartureTime) - currentDate) / 1000 / 60), 0);
+            return "Departing in " + etd + " min";
         };
         BusTracker.prototype.getRouteStyle = function (routeShortName) {
             var color = this.routeInfoService.getRouteColor(routeShortName);
@@ -363,7 +367,7 @@ define('bus-tracker',["require", "exports", "aurelia-framework", "VrtDao", "Rout
 
 
 ;
-define('text!bus-tracker.html',[],function(){return "<template>\r\n    <require from=\"style.css\"></require>\r\n    <div class=\"page\">\r\n        <div class=\"controlArea\">\r\n            <select style.bind=\"getRouteStyle(currentRoute.shortName)\" if.bind=\"routes\" value.bind=\"selectedRoute\">\r\n                <option model.bind=\"undefined\">Choose...</option>\r\n                <option style.bind=\"getRouteStyle(route.shortName)\" repeat.for=\"route of routes\" model.bind=\"route\">\r\n                    ${route.shortName} - ${route.longName}\r\n                </option>\r\n            </select>\r\n            <select style.bind=\"getRouteStyle(currentRoute.shortName)\" if.bind=\"stops\" value.bind=\"selectedStop\">\r\n                <option model.bind=\"undefined\">Choose...</option>\r\n                <option repeat.for=\"stop of stops\" model.bind=\"stop\">\r\n                    ${stop.stopDescription}(${stop.stopId})\r\n                </option>\r\n            </select>\r\n        </div>\r\n        <div class=\"arrivalContainer\">\r\n            <div class=\"arrival\" if.bind=\"currentStopInfo\" repeat.for=\"arriving of currentStopInfo.data\">\r\n                <span class=\"arrivalText\" style.bind=\"getRouteStyle(arriving.routeShortName)\" innerhtml.bind=\"arrivalText(arriving)\"></span>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    <div class=\"footer\">\r\n        \r\n        <div if.bind=\"currentStopInfo\">Estimates are ${timeSinceLastDataTimestamp} seconds old. <span class=\"refreshIndicator\" if.bind=\"!notCurrentlyRequesting\">Refreshing...</span></div>\r\n    </div>\r\n</template>";});;
+define('text!bus-tracker.html',[],function(){return "<template>\r\n    <require from=\"style.css\"></require>\r\n    <div class=\"page\">\r\n        <div class=\"controlArea\">\r\n            <select style.bind=\"getRouteStyle(currentRoute.shortName)\" if.bind=\"routes\" value.bind=\"selectedRoute\">\r\n                <option model.bind=\"undefined\">Choose...</option>\r\n                <option style.bind=\"getRouteStyle(route.shortName)\" repeat.for=\"route of routes\" model.bind=\"route\">\r\n                    ${route.shortName} - ${route.longName}\r\n                </option>\r\n            </select>\r\n            <select style.bind=\"getRouteStyle(currentRoute.shortName)\" if.bind=\"stops\" value.bind=\"selectedStop\">\r\n                <option model.bind=\"undefined\">Choose...</option>\r\n                <option repeat.for=\"stop of stops\" model.bind=\"stop\">\r\n                    ${stop.stopDescription}(${stop.stopId})\r\n                </option>\r\n            </select>\r\n        </div>\r\n        <div class=\"arrivalContainer\">\r\n            <div class=\"arrival\" if.bind=\"currentStopInfo\" repeat.for=\"arriving of currentStopInfo.data\">\r\n                <span class=\"routeName\">\r\n                    <span class=\"routeNumber\"\r\n                        style.bind=\"getRouteStyle(arriving.routeShortName)\">${arriving.masterRouteShortName}</span>\r\n                    <span>\r\n                        <div>${arriving.routeLongName}</div>\r\n                        <div>${arriving.destination}</div>\r\n                    </span>\r\n                </span>\r\n                <span class=\"timingInfo\">\r\n                    <div>${getArrivalText(arriving)}</div>\r\n                    <div>${getDepartureText(arriving)}</div>\r\n                </span>\r\n                \r\n            </div>\r\n        </div>\r\n    </div>\r\n    <div class=\"footer\">\r\n        <div if.bind=\"currentStopInfo\">Estimates are ${timeSinceLastDataTimestamp} seconds old. <span\r\n                class=\"refreshIndicator\" if.bind=\"!notCurrentlyRequesting\">Refreshing...</span></div>\r\n    </div>\r\n</template>";});;
 define('environment',["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -403,6 +407,6 @@ define('resources/index',["require", "exports"], function (require, exports) {
 
 
 ;
-define('text!style.css',[],function(){return "html {\r\n    height: 80%;\r\n}\r\nbody {\r\n    height: 100%;\r\n}\r\n.arrival {\r\n    margin: 5px;\r\n    height: 85px;\r\n    width: 400px;\r\n    display: flex;\r\n}\r\n.arrivalText {\r\n    border: black solid 2px;\r\n    border-radius: 5px;\r\n    display: block;\r\n    width: 100%;\r\n    padding-top: 0px;\r\n}\r\n.controlArea{\r\n    margin: 5px;\r\n}\r\n.footer {\r\n    position: fixed;\r\n    bottom: 0;\r\n    padding: 10px;\r\n    width: 100%;\r\n    background: lightgray;\r\n    height: 20px;\r\n}\r\n.arrivalContainer {\r\n    display: -ms-flexbox;\r\n    display: -webkit-flex;\r\n    display: flex;\r\n    -webkit-flex-flow: wrap column;\r\n    flex-flow: wrap column;\r\n    max-height: 100%;\r\n}\r\n\r\nbody {\r\n    margin: 0px;\r\n    font-family: 'Assistant', sans-serif;\r\n    font-size: 18px;\r\n}\r\n.page {\r\n    margin: 8px;\r\n    padding-bottom: 40px;\r\n    height: 100%;\r\n    display: inline-block;\r\n}";});;
+define('text!style.css',[],function(){return "html {\r\n    height: 80%;\r\n}\r\nbody {\r\n    height: 100%;\r\n}\r\n.arrival {\r\n    margin: 5px;\r\n    display: flex;\r\n    background-color: #eeeeee;\r\n    padding: 10px;\r\n    border-radius: 3px;\r\n    justify-content: space-between;\r\n}\r\n.arrivalText {\r\n    border: black solid 2px;\r\n    border-radius: 5px;\r\n    display: block;\r\n    width: 100%;\r\n    padding-top: 0px;\r\n}\r\n.controlArea{\r\n    margin: 5px;\r\n}\r\n.footer {\r\n    position: fixed;\r\n    bottom: 0;\r\n    padding: 10px;\r\n    width: 100%;\r\n    background: #eeeeee;\r\n    height: 20px;\r\n}\r\n.arrivalContainer {\r\n    display: -ms-flexbox;\r\n    display: -webkit-flex;\r\n    display: flex;\r\n    -webkit-flex-flow: wrap column;\r\n    flex-flow: wrap column;\r\n    max-height: 100%;\r\n}\r\n\r\nbody {\r\n    margin: 0px;\r\n    font-family: 'Assistant', sans-serif;\r\n    font-size: 18px;\r\n}\r\n.page {\r\n    margin: 8px;\r\n    padding-bottom: 40px;\r\n    height: 100%;\r\n    display: inline-block;\r\n}\r\n.routeNumber {\r\n    width: 20px;\r\n    height: 20px;\r\n    margin: 5px;\r\n    margin-right: 15px;\r\n    border-radius: 20px;\r\n    font-size: 18px;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n}\r\n.routeName {\r\n    display: flex;\r\n    align-items: center;\r\n}\r\n.timingInfo {\r\n    text-align: right;\r\n}";});;
 define('resources',['resources/index'],function(m){return m;});
 //# sourceMappingURL=app-bundle.js.map
