@@ -17,12 +17,24 @@
         </div>
         <div class="arrivalContainer">
             <div class="arrival" if.bind="currentStopInfo" repeat.for="arriving of currentStopInfo.data">
-                <span class="arrivalText" style.bind="getRouteStyle(arriving.routeShortName)" innerhtml.bind="arrivalText(arriving)"></span>
+                <span class="routeName">
+                    <span class="routeNumber"
+                        style.bind="getRouteStyle(arriving.routeShortName)">${arriving.masterRouteShortName}</span>
+                    <span>
+                        <div>${arriving.routeLongName}</div>
+                        <div>${arriving.destination}</div>
+                    </span>
+                </span>
+                <span class="timingInfo">
+                    <div>${getArrivalText(arriving)}</div>
+                    <div>${getDepartureText(arriving)}</div>
+                </span>
+                
             </div>
         </div>
     </div>
     <div class="footer">
-        
-        <div if.bind="currentStopInfo">Estimates are ${timeSinceLastDataTimestamp} seconds old. <span class="refreshIndicator" if.bind="!notCurrentlyRequesting">Refreshing...</span></div>
+        <div if.bind="currentStopInfo">Estimates are ${timeSinceLastDataTimestamp} seconds old. <span
+                class="refreshIndicator" if.bind="!notCurrentlyRequesting">Refreshing...</span></div>
     </div>
 </template>

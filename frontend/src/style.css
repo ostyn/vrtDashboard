@@ -6,9 +6,11 @@ body {
 }
 .arrival {
     margin: 5px;
-    height: 85px;
-    width: 400px;
     display: flex;
+    background-color: #eeeeee;
+    padding: 10px;
+    border-radius: 3px;
+    justify-content: space-between;
 }
 .arrivalText {
     border: black solid 2px;
@@ -25,7 +27,7 @@ body {
     bottom: 0;
     padding: 10px;
     width: 100%;
-    background: lightgray;
+    background: #eeeeee;
     height: 20px;
 }
 .arrivalContainer {
@@ -47,4 +49,22 @@ body {
     padding-bottom: 40px;
     height: 100%;
     display: inline-block;
+}
+.routeNumber {
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+    margin-right: 15px;
+    border-radius: 20px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.routeName {
+    display: flex;
+    align-items: center;
+}
+.timingInfo {
+    text-align: right;
 }
