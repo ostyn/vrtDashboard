@@ -36,7 +36,7 @@ body {
     display: -ms-flexbox;
     -webkit-flex-flow: wrap column;
     flex-flow: wrap column;
-    width: calc(100vw - 20px);
+    width: calc(100vw - 40px);
     overflow: auto;
     column-width: 400px;
 }
