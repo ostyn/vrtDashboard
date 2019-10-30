@@ -11,6 +11,8 @@ body {
     padding: 10px;
     border-radius: 3px;
     justify-content: space-between;
+    break-inside: avoid-column;
+    -webkit-column-break-inside: avoid;
 }
 .arrivalText {
     border: black solid 2px;
@@ -32,13 +34,12 @@ body {
 }
 .arrivalContainer {
     display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
     -webkit-flex-flow: wrap column;
     flex-flow: wrap column;
-    max-height: 100%;
+    width: calc(100vw - 20px);
+    overflow: auto;
+    column-width: 400px;
 }
-
 body {
     margin: 0px;
     font-family: 'Assistant', sans-serif;
